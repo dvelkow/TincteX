@@ -15,7 +15,7 @@ class ChromolexiaTranslator:
             'E': '#FF00FF',  # Magenta
             'F': '#00FFFF',  # Cyan
             'G': '#556B2F',  # Dark Olive Green
-            'H': '#800080',  # Purple
+            'H': '#CCFF00',  # Yellow-Green
             'I': '#008000',  # Dark Green
             'J': '#FF1493',  # Deep Pink
             'K': '#FFD700',  # Gold
@@ -23,7 +23,7 @@ class ChromolexiaTranslator:
             'M': '#808080',  # Gray
             'N': '#00CED1',  # Dark Turquoise
             'O': '#48494B',  # Iron
-            'P': '#9400D3',  # Dark Violet
+            'P': '#FF746C',  # Pastel Red
             'Q': '#FFA500',  # Orange
             'R': '#B22222',  # Fire Brick
             'S': '#4682B4',  # Steel Blue
@@ -33,10 +33,11 @@ class ChromolexiaTranslator:
             'W': '#BA55D3',  # Medium Orchid
             'X': '#CD853F',  # Peru
             'Y': '#DB7093',  # Pale Violet Red
-            'Z': '#228B22'   # Forest Green
+            'Z': '#F8DE7E'   # Mellow Yellow
         }
         
         self.show_letters = True
+        self.show_input = True
         self.setup_gui()
         
     def setup_gui(self):
@@ -44,11 +45,15 @@ class ChromolexiaTranslator:
         main_frame = ttk.Frame(self.root, padding="10")
         main_frame.grid(row=0, column=0, sticky=(tk.W, tk.E, tk.N, tk.S))
         
-        # Input area
-        input_label = ttk.Label(main_frame, text="Type your text:", font=('Arial', 12))
+        # Input area frame (for hiding/showing)
+        self.input_frame = ttk.Frame(main_frame)
+        self.input_frame.grid(row=0, column=0, sticky=(tk.W, tk.E), pady=(0, 10))
+        
+        # Input label and text area
+        input_label = ttk.Label(self.input_frame, text="Type your text:", font=('Arial', 12))
         input_label.grid(row=0, column=0, sticky=tk.W, pady=(0, 5))
         
-        self.input_text = tk.Text(main_frame, height=3, width=50, font=('Arial', 12))
+        self.input_text = tk.Text(self.input_frame, height=3, width=50, font=('Arial', 12))
         self.input_text.grid(row=1, column=0, pady=(0, 10))
         self.input_text.bind('<KeyRelease>', self.on_text_change)
         
@@ -76,7 +81,14 @@ class ChromolexiaTranslator:
         letters_btn = ttk.Checkbutton(buttons_frame, text="Show Letters", 
                                     variable=self.show_letters_var, 
                                     command=self.toggle_letters)
-        letters_btn.grid(row=0, column=1, sticky=tk.W)
+        letters_btn.grid(row=0, column=1, sticky=tk.W, padx=(0, 10))
+        
+        # Hide input toggle button
+        self.show_input_var = tk.BooleanVar(value=True)
+        input_btn = ttk.Checkbutton(buttons_frame, text="Show Input Area", 
+                                  variable=self.show_input_var, 
+                                  command=self.toggle_input)
+        input_btn.grid(row=0, column=2, sticky=tk.W)
         
         # Legend frame (hidden by default)
         self.legend_frame = ttk.Frame(main_frame)
@@ -117,6 +129,12 @@ class ChromolexiaTranslator:
         self.show_letters = self.show_letters_var.get()
         self.on_text_change()
     
+    def toggle_input(self):
+        if self.show_input_var.get():
+            self.input_frame.grid()
+        else:
+            self.input_frame.grid_remove()
+    
     def on_text_change(self, event=None):
         # Clear canvas
         self.canvas.delete("all")
@@ -139,13 +157,18 @@ class ChromolexiaTranslator:
                 if self.show_letters:
                     self.canvas.create_text(x + block_width/2, y + block_width/2, 
                                           text=char, font=('Arial', 12))
-                
+            elif char == ' ':
+                # Add space between blocks
                 x += block_width + 5
-                
-                # Move to next line if needed
-                if x > max_width:
-                    x = 10
-                    y += block_width + 5
+            
+            # Move to next position if character was processed
+            if char in self.color_map:
+                x += block_width + 5
+            
+            # Move to next line if needed
+            if x > max_width:
+                x = 10
+                y += block_width + 5
 
 def main():
     root = tk.Tk()
