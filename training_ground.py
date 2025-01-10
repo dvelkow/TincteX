@@ -1,5 +1,7 @@
 import tkinter as tk
 from tkinter import ttk
+import random
+from sentences import SENTENCES
 
 class ChromolexiaTranslator:
     def __init__(self, root):
@@ -69,26 +71,31 @@ class ChromolexiaTranslator:
         buttons_frame = ttk.Frame(main_frame)
         buttons_frame.grid(row=4, column=0, sticky=tk.W)
         
+        # Random sentence button
+        random_btn = ttk.Button(buttons_frame, text="Generate Random Sentence", 
+                              command=self.generate_random_sentence)
+        random_btn.grid(row=0, column=0, sticky=tk.W, padx=(0, 10))
+        
         # Legend toggle button
         self.show_legend_var = tk.BooleanVar(value=False)
         legend_btn = ttk.Checkbutton(buttons_frame, text="Show Color Legend", 
                                    variable=self.show_legend_var, 
                                    command=self.toggle_legend)
-        legend_btn.grid(row=0, column=0, sticky=tk.W, padx=(0, 10))
+        legend_btn.grid(row=0, column=1, sticky=tk.W, padx=(0, 10))
         
         # Letters toggle button
         self.show_letters_var = tk.BooleanVar(value=True)
         letters_btn = ttk.Checkbutton(buttons_frame, text="Show Letters", 
                                     variable=self.show_letters_var, 
                                     command=self.toggle_letters)
-        letters_btn.grid(row=0, column=1, sticky=tk.W, padx=(0, 10))
+        letters_btn.grid(row=0, column=2, sticky=tk.W, padx=(0, 10))
         
         # Hide input toggle button
         self.show_input_var = tk.BooleanVar(value=True)
         input_btn = ttk.Checkbutton(buttons_frame, text="Show Input Area", 
                                   variable=self.show_input_var, 
                                   command=self.toggle_input)
-        input_btn.grid(row=0, column=2, sticky=tk.W)
+        input_btn.grid(row=0, column=3, sticky=tk.W)
         
         # Legend frame (hidden by default)
         self.legend_frame = ttk.Frame(main_frame)
@@ -134,6 +141,13 @@ class ChromolexiaTranslator:
             self.input_frame.grid()
         else:
             self.input_frame.grid_remove()
+    
+    def generate_random_sentence(self):
+        """Generate and insert a random sentence into the input text area"""
+        sentence = random.choice(SENTENCES)
+        self.input_text.delete("1.0", tk.END)
+        self.input_text.insert("1.0", sentence)
+        self.on_text_change()
     
     def on_text_change(self, event=None):
         # Clear canvas
